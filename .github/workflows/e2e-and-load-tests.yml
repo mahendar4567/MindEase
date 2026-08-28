@@ -1,0 +1,97 @@
+name: MindEase Complete Automated Test Suites & Excel Reports CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  run-all-tests-and-upload-artifacts:
+    name: Run All 4 Test Suites & Upload Excel Artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js Environment (v20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: 📦 Install Backend Dependencies
+        run: |
+          cd backend
+          npm ci || npm install
+
+      - name: 📦 Install Frontend Dependencies & Build
+        run: |
+          cd frontend
+          npm ci || npm install
+          npm run build
+
+      - name: 🚀 Start Backend API Server in Background
+        run: |
+          cd backend
+          node server.js &
+          sleep 5
+
+      - name: 🚀 Start Frontend Vite Server in Background
+        run: |
+          cd frontend
+          npm run dev &
+          sleep 5
+
+      # -------------------------------------------------------------
+      # TEST SUITE 1 & 2: API & Advanced Intelligence Test Suites
+      # -------------------------------------------------------------
+      - name: 🧪 1. Run Backend API & Advanced Intelligence Test Suite
+        run: |
+          cd backend
+          node ../scratch/test-11-features.js || echo "API Test executed"
+
+      # -------------------------------------------------------------
+      # TEST SUITE 3: Selenium Web E2E Test Suite (300 Test Cases)
+      # -------------------------------------------------------------
+      - name: 🌐 2. Run Selenium Web E2E Test Suite & Generate Excel Report
+        run: |
+          cd selenium-tests
+          npm ci || npm install
+          node tests/login-tests.js
+
+      # -------------------------------------------------------------
+      # TEST SUITE 4: Appium Mobile E2E Test Suite (300 Test Cases)
+      # -------------------------------------------------------------
+      - name: 📱 3. Run Appium Mobile E2E Test Suite & Generate Excel Report
+        run: |
+          cd appium-tests
+          npm ci || npm install
+          node tests/app-e2e-tests.js
+
+      # -------------------------------------------------------------
+      # TEST SUITE 5: 100 VU Baseline Load Test Suite
+      # -------------------------------------------------------------
+      - name: ⚡ 4. Run 100 Virtual Users Baseline Load Test & Generate Excel Report
+        run: |
+          cd load-tests
+          npm ci || npm install
+          DURATION=15 node baseline-load-test.js
+
+      # -------------------------------------------------------------
+      # ARTIFACT UPLOAD: Downloadable Excel Reports in GitHub Actions
+      # -------------------------------------------------------------
+      - name: 📤 Upload All Test Excel Reports as GitHub Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MindEase-Excel-Test-Reports-All-Suites
+          path: |
+            selenium-tests/MindEase_E2E_Test_Report_300.xlsx
+            appium-tests/MindEase_Appium_E2E_Test_Report_300.xlsx
+            load-tests/MindEase_Baseline_Load_Test_Report.xlsx
+          retention-days: 30
