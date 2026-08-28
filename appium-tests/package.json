@@ -1,0 +1,14 @@
+{
+  "name": "mindease-appium-tests",
+  "version": "1.0.0",
+  "description": "Appium Mobile E2E Test Suite and 300-Test Excel Report Generator for MindEase App",
+  "main": "tests/app-e2e-tests.js",
+  "scripts": {
+    "test": "node tests/app-e2e-tests.js",
+    "generate-excel": "node tests/app-e2e-tests.js"
+  },
+  "dependencies": {
+    "webdriverio": "^8.39.0",
+    "xlsx": "^0.18.5"
+  }
+}
