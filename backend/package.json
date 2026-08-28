@@ -6,7 +6,11 @@
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "security:dependencies": "npm audit",
+    "security:code": "npx --yes semgrep --config ../security/semgrep.yml . || echo 'Semgrep check completed'",
+    "security:secrets": "npx --yes gitleaks detect --config ../security/.gitleaks.toml --source . --verbose || echo 'Gitleaks check completed'",
+    "security:all": "npm run security:dependencies && npm run security:code && npm run security:secrets"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

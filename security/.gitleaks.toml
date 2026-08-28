@@ -1,0 +1,28 @@
+title = "MindEase Gitleaks Secret Detection Configuration"
+
+[[rules]]
+id = "jwt-secret-key"
+description = "Hardcoded JWT secret key"
+regex = '''(?i)(jwt_secret|jwtsecret|jwt_key)\s*[:=]\s*["'][A-Za-z0-9_\-]{8,}["']'''
+tags = ["secret", "jwt"]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API key pattern"
+regex = '''(?i)(api_key|apikey|secret_key)\s*[:=]\s*["'][A-Za-z0-9_\-]{16,}["']'''
+tags = ["secret", "api-key"]
+
+[[rules]]
+id = "mongodb-connection-string"
+description = "MongoDB connection string with credentials"
+regex = '''mongodb(\+srv)?://[a-zA-Z0-9_]+:[a-zA-Z0-9_]+@[a-zA-Z0-9_\-\.]+'''
+tags = ["secret", "database"]
+
+[allowlist]
+description = "Ignore node_modules and build artifacts"
+paths = [
+  '''node_modules/''',
+  '''dist/''',
+  '''package-lock\.json''',
+  '''\.env\.example'''
+]

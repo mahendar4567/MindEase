@@ -1,0 +1,42 @@
+rules:
+  - id: express-check-hardcoded-secret
+    patterns:
+      - pattern-either:
+          - pattern: const $SECRET = "..."
+          - pattern: let $SECRET = "..."
+          - pattern: var $SECRET = "..."
+      - pattern-regex: (jwt_secret|api_key|password|private_key|token|auth_token)\s*=\s*['"][A-Za-z0-9_\-]{8,}['"]
+    message: "Potential hardcoded secret or API key detected in source code. Use process.env environment variables instead."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  - id: express-check-missing-helmet
+    patterns:
+      - pattern: const $APP = express()
+      - pattern-not-inside: |
+          $APP.use(helmet(...))
+    message: "Express application instance found without Helmet security middleware attached."
+    severity: INFO
+    languages: [javascript, typescript]
+
+  - id: express-nosql-injection-risk
+    patterns:
+      - pattern: $MODEL.find({ $KEY: req.body.$FIELD })
+    message: "Unsanitized user input passed directly into Mongoose query filter object. Verify type validation or use explicit query parameters to prevent NoSQL injection."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  - id: express-cookie-missing-httponly
+    patterns:
+      - pattern: res.cookie($NAME, $VAL, { ... })
+      - pattern-not: res.cookie($NAME, $VAL, { ..., httpOnly: true, ... })
+    message: "Cookie set without explicit httpOnly: true flag. Cookies storing tokens or session IDs should always use httpOnly."
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  - id: express-cors-wildcard-origin
+    patterns:
+      - pattern: cors({ origin: '*', ... })
+    message: "CORS configured with wildcard origin ('*'). Restrict origin to trusted frontend domain when handling credentials."
+    severity: WARNING
+    languages: [javascript, typescript]
