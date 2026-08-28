@@ -1,0 +1,14 @@
+{
+  "name": "mindease-selenium-tests",
+  "version": "1.0.0",
+  "description": "Selenium E2E Test Suite and 300-Test Excel Report Generator for MindEase Platform",
+  "main": "tests/login-tests.js",
+  "scripts": {
+    "test": "node tests/login-tests.js",
+    "generate-excel": "node generate-excel-report.js"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.24.0",
+    "xlsx": "^0.18.5"
+  }
+}
