@@ -9,7 +9,7 @@ on:
 
 jobs:
   run-all-tests-and-upload-artifacts:
-    name: Run All 4 Test Suites & Upload Excel Artifacts
+    name: Run All Test Suites & Upload Master Excel Report
     runs-on: ubuntu-latest
 
     steps:
@@ -49,48 +49,45 @@ jobs:
           sleep 5
 
       # -------------------------------------------------------------
-      # TEST SUITE 1 & 2: API & Advanced Intelligence Test Suites
+      # TEST SUITES EXECUTION
       # -------------------------------------------------------------
       - name: 🧪 1. Run Backend API & Advanced Intelligence Test Suite
         run: |
           cd backend
           node ../scratch/test-11-features.js || echo "API Test executed"
 
-      # -------------------------------------------------------------
-      # TEST SUITE 3: Selenium Web E2E Test Suite (300 Test Cases)
-      # -------------------------------------------------------------
-      - name: 🌐 2. Run Selenium Web E2E Test Suite & Generate Excel Report
+      - name: 🌐 2. Run Selenium Web E2E Test Suite (300 Test Cases)
         run: |
           cd selenium-tests
           npm ci || npm install
           node tests/login-tests.js
 
-      # -------------------------------------------------------------
-      # TEST SUITE 4: Appium Mobile E2E Test Suite (300 Test Cases)
-      # -------------------------------------------------------------
-      - name: 📱 3. Run Appium Mobile E2E Test Suite & Generate Excel Report
+      - name: 📱 3. Run Appium Mobile E2E Test Suite (300 Test Cases)
         run: |
           cd appium-tests
           npm ci || npm install
           node tests/app-e2e-tests.js
 
-      # -------------------------------------------------------------
-      # TEST SUITE 5: 100 VU Baseline Load Test Suite
-      # -------------------------------------------------------------
-      - name: ⚡ 4. Run 100 Virtual Users Baseline Load Test & Generate Excel Report
+      - name: ⚡ 4. Run 100 Virtual Users Baseline Load Test Suite
         run: |
           cd load-tests
           npm ci || npm install
           DURATION=15 node baseline-load-test.js
 
+      - name: 📊 5. Generate Master Consolidated Excel Report Workbook
+        run: |
+          cd selenium-tests
+          node generate-master-excel-report.js
+
       # -------------------------------------------------------------
-      # ARTIFACT UPLOAD: Downloadable Excel Reports in GitHub Actions
+      # ARTIFACT UPLOAD: Master Downloadable Excel Workbook in GitHub
       # -------------------------------------------------------------
-      - name: 📤 Upload All Test Excel Reports as GitHub Artifacts
+      - name: 📤 Upload Master Consolidated Excel Test Report
         uses: actions/upload-artifact@v4
         with:
-          name: MindEase-Excel-Test-Reports-All-Suites
+          name: MindEase-Master-Complete-Test-Report-Excel
           path: |
+            MindEase_Master_Complete_Test_Report.xlsx
             selenium-tests/MindEase_E2E_Test_Report_300.xlsx
             appium-tests/MindEase_Appium_E2E_Test_Report_300.xlsx
             load-tests/MindEase_Baseline_Load_Test_Report.xlsx
