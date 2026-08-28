@@ -16,11 +16,16 @@ const app = express();
 // Security Middlewares
 app.use(helmet());
 
-// CORS Configuration
-const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
+// Dynamic CORS Configuration for Local Network & Mobile Devices
 app.use(
   cors({
-    origin: allowedOrigin,
+    origin: (origin, callback) => {
+      // Allow local network IP addresses, localhost, and requests without origin header
+      if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('10.192.254.186') || origin.startsWith('http://10.') || origin.startsWith('http://192.168.')) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   })
 );
@@ -51,7 +56,8 @@ app.use(notFound);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
+const HOST = '0.0.0.0';
 
-app.listen(PORT, () => {
-  console.log(`MindEase Server running in ${process.env.NODE_ENV || 'development'} mode on http://localhost:${PORT}`);
+app.listen(PORT, HOST, () => {
+  console.log(`MindEase Server running in ${process.env.NODE_ENV || 'development'} mode on http://${HOST}:${PORT}`);
 });
